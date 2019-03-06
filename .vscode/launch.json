@@ -10,6 +10,13 @@
             "name": "Launch Clock",
             "url": "${workspaceFolder}/Clock.html",
 
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch SideScroller",
+            "url": "${workspaceFolder}/SideScroller.html",
+
         }
     ]
 }
