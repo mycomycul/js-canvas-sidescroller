@@ -1,28 +1,115 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <style>
-            canvas{
-                border: 1px solid #d3d3d3;
-                background-color:#f1f1f1;
-            }
-        </style>
-    </head>
-    <body onload="startGame()">
-        <script>
-        function startGame(){
-            myGameArea.start();
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <style>
+      canvas {
+        border: 1px solid #d3d3d3;
+        background-color: #f1f1f1;
+      }
+      
+    </style>
+  </head>
+  <body onload="startGame()" onkeypress="moveComponent()">
+        <button onclick="myGamePiece.moveUp()">UP</button>
+        <button onclick="myGamePiece.moveDown()">DOWN</button>
+        <button onclick="myGamePiece.moveLeft()">LEFT</button>
+        <button onclick="myGamePiece.moveRight()">RIGHT</button>
+    <script>
+      var myGamePiece;
+      function startGame() {
+        myGameArea.start();
+        myGamePiece = new component(30, 30, "#00ff00", 100, 120);
+      }
+      function updateGameArea() {
+        myGameArea.clear();
+        //Mouse Activity
+        if(myGameArea.x && myGameArea.y){
+            myGamePiece.x = myGameArea.x;
+            myGamePiece.y = myGameArea.y;
+
         }
-        var myGameArea = {
-            canvas: document.createElement('canvas'),
-            start: function(){
-                this.canvas.width = 480;
-                this.canvas.hieght= 270;
-                this.context = this.canvas.getContext("2d");
-                document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-            }
+        //Use with keyboard and button actions
+        /*
+        myGamePiece.speedX = 0;
+        myGamePiece.speedY = 0; 
+        if (myGameArea.keys && myGameArea.keys[37]) {myGamePiece.moveLeft(); }
+        if (myGameArea.keys && myGameArea.keys[38]) {myGamePiece.moveUp(); }
+        if (myGameArea.keys && myGameArea.keys[39]) {myGamePiece.moveRight(); }
+        if (myGameArea.keys && myGameArea.keys[40]) {myGamePiece.moveDown(); }
+        myGamePiece.newPos();
+
+        */
+        myGamePiece.update();
+      }
+
+      var myGameArea = {
+        canvas: document.createElement("canvas"),
+        start: function() {
+            //Setup Canvas Size and Location
+          this.canvas.width = 480;
+          this.canvas.height = 270;
+          this.context = this.canvas.getContext("2d");
+          document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+          //Reload the game every 20ms
+          this.interval = setInterval(updateGameArea, 20);
+
+          //Setup Check for keyboard activity
+         /* window.addEventListener('keydown', function(e){
+              myGameArea.keys = (myGameArea.keys || []);
+              myGameArea.keys[e.keyCode] = true;
+          });
+          window.addEventListener('keyup',function(e){
+              myGameArea.keys[e.keyCode] = false;
+          })*/
+          //Setup Check for mouse action
+
+          this.canvas.style.cursor = "none";
+          window.addEventListener('mousemove', function(e) {
+          myGameArea.x = e.pageX;
+          myGameArea.y = e.pageY;
+          })
+        },
+        clear: function() {
+          this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         }
+      };
+
+      function component(width, height, color, x, y) {
+        this.width = width;
+        this.height = height;
+        this.speedX = 0;
+        this.speedY = 0;
+        this.x = x;
+        this.y = y;
+        this.update = function() {
+          ctx = myGameArea.context;
+          ctx.fillStyle = color;
+          ctx.fillRect(this.x, this.y, this.width, this.height);
+        };
+        this.newPos = function(){
+            this.x += this.speedX;
+            this.y += this.speedY;
+        }
+        this.moveLeft = function(){
+            this.speedX -=1;
+        }
+        this.moveRight = function(){
+            this.speedX +=1;
+        }        
+        this.moveUp = function(){
+            this.speedY -= 1;
+        }        
+        this.moveDown = function(){
+            this.speedY +=1;
+        }
+        function stopMove(){
+           this.speedX = 0;
+            this.speedy = 0;
+
+        }
+      }
     </script>
-    </body>
+  </body>
 </html>
