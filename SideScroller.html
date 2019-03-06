@@ -21,6 +21,7 @@
       function startGame() {
         myGameArea.start();
         myGamePiece = new component(30, 30, "#00ff00", 100, 120);
+        myObstacle = new component(10,200,"blue",300,120);
       }
       function updateGameArea() {
         myGameArea.clear();
@@ -31,7 +32,7 @@
 
         }
         //Use with keyboard and button actions
-        /*
+        
         myGamePiece.speedX = 0;
         myGamePiece.speedY = 0; 
         if (myGameArea.keys && myGameArea.keys[37]) {myGamePiece.moveLeft(); }
@@ -40,7 +41,7 @@
         if (myGameArea.keys && myGameArea.keys[40]) {myGamePiece.moveDown(); }
         myGamePiece.newPos();
 
-        */
+        myObstacle.update();
         myGamePiece.update();
       }
 
@@ -56,20 +57,20 @@
           this.interval = setInterval(updateGameArea, 20);
 
           //Setup Check for keyboard activity
-         /* window.addEventListener('keydown', function(e){
+          window.addEventListener('keydown', function(e){
               myGameArea.keys = (myGameArea.keys || []);
               myGameArea.keys[e.keyCode] = true;
           });
           window.addEventListener('keyup',function(e){
               myGameArea.keys[e.keyCode] = false;
-          })*/
+          })
           //Setup Check for mouse action
 
-          this.canvas.style.cursor = "none";
+          /*this.canvas.style.cursor = "none";
           window.addEventListener('mousemove', function(e) {
           myGameArea.x = e.pageX;
           myGameArea.y = e.pageY;
-          })
+          })*/
         },
         clear: function() {
           this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
