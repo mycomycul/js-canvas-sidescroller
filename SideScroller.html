@@ -9,34 +9,50 @@
         background-color: #f1f1f1;
       }
     </style>
+    <link rel="stylesheet" type="text/css" href="site.css" />
   </head>
-  <body onload="startGame()" >
-    <div style="margin:0 auto; text-align:center;" id="canvasHolder">
-      <div>
-          <span>The faster the game and the closer your game piece is to the right, the faster your score grows</span>
-         
-    <ul style="text-align: center; list-style-position: inside;">
-      <li>Use the arrow keys to control your game piece</li>
-      <li>Press plus or minus to to increase or decrease the game speed. </li>
-      <li>Press Enter to restart</li>
-    </ul>
-  
-    <input id="gameRateSlider" type="range" min="0" max="100">
+  <body onload="startGame()">
+    <div id="canvasHolder">
+      <section id="topRow">
+        <span
+          >The faster the game and the closer your game piece is to the right,
+          the faster your score grows</span>
 
-    </div>
+        <ul style="text-align: center; list-style-position: inside;">
+          <li>Use the arrow keys to control your game piece</li>
+          <li>
+            Press plus or minus to to increase or decrease the game speed.
+          </li>
+          <li>Press Enter to restart</li>
+        </ul>
+      </section>
+      <section id="bottomrow">
+        <section id="infobar">
+          <input id="gameRateSlider" type="range" min="0" max="100" />
+          <div id="clearedScore"></div>
+        </section>
+      </section>
     </div>
 
     <script>
-      var myGamePiece, myScorePiece, myScore, gameRate;
+      var myGamePiece, myScorePiece, myScore, gameRate, clearedObj;
       var myObstacles = [];
+      var resetKey = 13;
 
       function startGame() {
+        
         myScore = 0;
         myGameArea.start();
-        gameRate=10;
+        gameRate = 10;
         myGamePiece = new component(30, 30, "#00ff00", 10, 120);
-        myScorePiece = new component("20px", "Consolas", "black", 200, 40, "text");
-        
+        myScorePiece = new component(
+          "20px",
+          "Consolas",
+          "black",
+          200,
+          40,
+          "text"
+        );
       }
 
       function updateGameArea() {
@@ -68,9 +84,10 @@
         }
         //Move Obstacles
         for (var i = 0; i < myObstacles.length; i++) {
-          myObstacles[i].x -= 1*gameRate/10;
-          if(myObstacles[i].x < 0){
-          myObstacles.splice(i,1);}
+          myObstacles[i].x -= (1 * gameRate) / 10;
+          if (myObstacles[i].x < 0) {
+            myObstacles.splice(i, 1);
+          }
           myObstacles[i].update();
         }
 
@@ -96,28 +113,30 @@
           myGamePiece.moveDown();
         }
         //Change Speed
-        if(myGameArea.keys && myGameArea.keys[109]){
-          if (gameRate>0){
+        if (myGameArea.keys && myGameArea.keys[109]) {
+          if (gameRate > 0) {
             myGameArea.changeSpeed(-1);
           }
         }
-        if(myGameArea.keys && myGameArea.keys[107]){
-          if (gameRate<100){
+        if (myGameArea.keys && myGameArea.keys[107]) {
+          if (gameRate < 100) {
             myGameArea.changeSpeed(1);
           }
         }
         //Reset Game
-        if (myGameArea.keys && myGameArea.keys[13]){
+        if (myGameArea.keys && myGameArea.keys[resetKey]) {
           myGameArea.reset();
-
         }
         //Increase score accumulation rate as gamepiece moves towards right side and in proportion with gamerate
-        myScore += Math.floor(((myGamePiece.x*2)/myGameArea.canvas.width + 1 * gameRate ))
-//   myScorePiece.text = "SCORE: " + myScore + " frames: " + myGameArea.frameNo;
-        myScorePiece.text = "SCORE: " + myScore + " frames: " + myGameArea.frameNo;
+        myScore += Math.floor(
+          (myGamePiece.x * 2) / myGameArea.canvas.width + (1 * gameRate) / 10
+        );
+        //   myScorePiece.text = "SCORE: " + myScore + " frames: " + myGameArea.frameNo;
+        myScorePiece.text =
+          "SCORE: " + myScore + " frames: " + myGameArea.frameNo;
 
+        
         myScorePiece.update();
-
         myGamePiece.newPos();
         myGamePiece.update();
       }
@@ -128,9 +147,9 @@
           //Setup Canvas Size and Location
           this.canvas.width = 480;
           this.canvas.height = 270;
-          this.canvas.style.margin = "auto"
+          this.canvas.style.margin = "auto";
           this.context = this.canvas.getContext("2d");
-          var canvasHolder = document.getElementById('canvasHolder');
+          var canvasHolder = document.getElementById("bottomrow");
           canvasHolder.appendChild(this.canvas);
           //Reload the game every 20ms
           this.frameNo = 0;
@@ -138,6 +157,9 @@
 
           //Setup Check for keyboard activity
           window.addEventListener("keydown", function(e) {
+            if (e.keyCode == resetKey) {
+              myGameArea.reset();
+            }
             myGameArea.keys = myGameArea.keys || [];
             myGameArea.keys[e.keyCode] = true;
           });
@@ -158,24 +180,26 @@
         stop: function() {
           clearInterval(this.interval);
         },
-        reset: function(){
+        reset: function() {
           this.stop();
           this.clear();
           this.canvas.parentNode.removeChild(this.canvas);
           myObstacles = [];
           startGame();
         },
-        changeSpeed: function(speedChange){
+        changeSpeed: function(speedChange) {
           gameRate += speedChange;
         }
-
       };
 
       function everyinterval(n) {
-        if ((myGameArea.frameNo*Math.floor(gameRate/10) / n) % 1 == 0) {
+        if (((myGameArea.frameNo * Math.floor(gameRate / 10)) / n) % 1 == 0) {
           return true;
         }
         return false;
+      }
+      function updateInfo(){
+        
       }
       function component(width, height, color, x, y, type) {
         this.type = type;
@@ -195,50 +219,49 @@
           } else {
             ctx.fillRect(this.x, this.y, this.width, this.height);
           }
-        }
-
-          this.newPos = function() {
-            this.x += this.speedX;
-            this.y += this.speedY;
-          };
-          this.moveLeft = function() {
-            this.speedX -= 1*gameRate/10;
-          };
-          this.moveRight = function() {
-            this.speedX += 1*gameRate/10;
-          };
-          this.moveUp = function() {
-            this.speedY -= 1*gameRate/10;
-          };
-          this.moveDown = function() {
-            this.speedY += 1*gameRate/10;
-          };
-          function stopMove() {
-            this.speedX = 0;
-            this.speedy = 0;
-          }
-          this.crashWith = function(otherobj) {
-            var myleft = this.x;
-            var myright = this.x + this.width;
-            var mytop = this.y;
-            var mybottom = this.y + this.height;
-            var otherleft = otherobj.x;
-            var otherright = otherobj.x + otherobj.width;
-            var othertop = otherobj.y;
-            var otherbottom = otherobj.y + otherobj.height;
-            var crash = true;
-            if (
-              mybottom < othertop ||
-              mytop > otherbottom ||
-              myright < otherleft ||
-              myleft > otherright
-            ) {
-              crash = false;
-            }
-            return crash;
-          };
         };
-      
+
+        this.newPos = function() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+        };
+        this.moveLeft = function() {
+          this.speedX -= (1 * gameRate) / 10;
+        };
+        this.moveRight = function() {
+          this.speedX += (1 * gameRate) / 10;
+        };
+        this.moveUp = function() {
+          this.speedY -= (1 * gameRate) / 10;
+        };
+        this.moveDown = function() {
+          this.speedY += (1 * gameRate) / 10;
+        };
+        function stopMove() {
+          this.speedX = 0;
+          this.speedy = 0;
+        }
+        this.crashWith = function(otherobj) {
+          var myleft = this.x;
+          var myright = this.x + this.width;
+          var mytop = this.y;
+          var mybottom = this.y + this.height;
+          var otherleft = otherobj.x;
+          var otherright = otherobj.x + otherobj.width;
+          var othertop = otherobj.y;
+          var otherbottom = otherobj.y + otherobj.height;
+          var crash = true;
+          if (
+            mybottom < othertop ||
+            mytop > otherbottom ||
+            myright < otherleft ||
+            myleft > otherright
+          ) {
+            crash = false;
+          }
+          return crash;
+        };
+      }
     </script>
   </body>
 </html>
