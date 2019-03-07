@@ -10,11 +10,22 @@
       }
     </style>
   </head>
-  <body onload="startGame()" onkeypress="moveComponent()">
-    <button onclick="myGamePiece.moveUp()">UP</button>
-    <button onclick="myGamePiece.moveDown()">DOWN</button>
-    <button onclick="myGamePiece.moveLeft()">LEFT</button>
-    <button onclick="myGamePiece.moveRight()">RIGHT</button>
+  <body onload="startGame()" >
+    <div style="margin:0 auto; text-align:center;" id="canvasHolder">
+      <div>
+          <span>The faster the game and the closer your game piece is to the right, the faster your score grows</span>
+         
+    <ul style="text-align: center; list-style-position: inside;">
+      <li>Use the arrow keys to control your game piece</li>
+      <li>Press plus or minus to to increase or decrease the game speed. </li>
+      <li>Press Enter to restart</li>
+    </ul>
+  
+    <input id="gameRateSlider" type="range" min="1" max="20">
+
+    </div>
+    </div>
+
     <script>
       var myGamePiece, myScorePiece, myScore, gameRate;
       var myObstacles = [];
@@ -25,6 +36,7 @@
         gameRate=2;
         myGamePiece = new component(30, 30, "#00ff00", 10, 120);
         myScorePiece = new component("20px", "Consolas", "black", 200, 40, "text");
+        
       }
 
       function updateGameArea() {
@@ -57,6 +69,8 @@
         //Move Obstacles
         for (var i = 0; i < myObstacles.length; i++) {
           myObstacles[i].x -= 1*gameRate;
+          if(myObstacles[i].x < 0){
+          myObstacles.splice(i,1);}
           myObstacles[i].update();
         }
 
@@ -81,10 +95,24 @@
         if (myGameArea.keys && myGameArea.keys[40]) {
           myGamePiece.moveDown();
         }
+        //decrease Speed
+        if(myGameArea.keys && myGameArea.keys[27]){
+          if (gameRate>0){
+
+          }
+        }
+        //Reset Game
+        if (myGameArea.keys && myGameArea.keys[13]){
+          myGameArea.reset();
+
+        }
         //Increase score accumulation rate as gamepiece moves towards right side and in proportion with gamerate
         myScore += Math.floor(((myGamePiece.x*2)/myGameArea.canvas.width * gameRate + 1))
+//   myScorePiece.text = "SCORE: " + myScore + " frames: " + myGameArea.frameNo;
         myScorePiece.text = "SCORE: " + myScore + " frames: " + myGameArea.frameNo;
+
         myScorePiece.update();
+
         myGamePiece.newPos();
         myGamePiece.update();
       }
@@ -95,8 +123,10 @@
           //Setup Canvas Size and Location
           this.canvas.width = 480;
           this.canvas.height = 270;
+          this.canvas.style.margin = "auto"
           this.context = this.canvas.getContext("2d");
-          document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+          var canvasHolder = document.getElementById('canvasHolder');
+          canvasHolder.appendChild(this.canvas);
           //Reload the game every 20ms
           this.frameNo = 0;
           this.interval = setInterval(updateGameArea, 20);
@@ -122,6 +152,13 @@
         },
         stop: function() {
           clearInterval(this.interval);
+        },
+        reset: function(){
+          this.stop();
+          this.clear();
+          this.canvas.parentNode.removeChild(this.canvas);
+          myObstacles = [];
+          startGame();
         }
       };
 
@@ -156,16 +193,16 @@
             this.y += this.speedY;
           };
           this.moveLeft = function() {
-            this.speedX -= 1;
+            this.speedX -= 1*gameRate;
           };
           this.moveRight = function() {
-            this.speedX += 1;
+            this.speedX += 1*gameRate;
           };
           this.moveUp = function() {
-            this.speedY -= 1;
+            this.speedY -= 1*gameRate;
           };
           this.moveDown = function() {
-            this.speedY += 1;
+            this.speedY += 1*gameRate;
           };
           function stopMove() {
             this.speedX = 0;
