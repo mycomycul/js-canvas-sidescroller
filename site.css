@@ -2,16 +2,39 @@
     display:inline-block;
     padding: 20px;
     border-radius:5px;
-    background-color:hsl(120, 42%, 75%);
+    background-color:black;
+    color:white;
+    
 
 }
 #bottomrow{
     display:flex;
+    height:290px;
+}
+.gradient-border{margin-top:10px;
+    margin-bottom:10px;
+    background-color: white;
+    padding:4px;
+    margin-right:20px;
+    border-radius:10px;
+    background: linear-gradient(217deg, rgba(255,0,0,.8), rgba(255,0,0,0) 70.71%),
+    linear-gradient(127deg, rgba(0,255,0,.8), rgba(0,255,0,0) 70.71%),
+    linear-gradient(336deg, rgba(0,0,255,.8), rgba(0,0,255,0) 70.71%);
 }
 #infobar{
-    margin-right:20px;
+    height:calc(100% - 2*4px);
+    /* height:100%; */
+
+    background-color: black;
+   padding:5px;
+    border-radius:8px;
+ 
 }
 
-.infosection{
-    background-color: gray;
+.info-section{
+    margin:10px 5px;
+    background-color: #cccccc;
+    color:black;
+    padding:5px;
+    border-radius:3px;
    }
