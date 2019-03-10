@@ -106,7 +106,6 @@
         );
         //   myScorePiece.text = "SCORE: " + myScore + " frames: " + myGameArea.frameNo;
         updateObjectProperties(infoBoxes);
-        myScorePiece.update();
         myGamePiece.newPos();
         myGamePiece.update();
       }
