@@ -1,4 +1,4 @@
-
+//TODO: Automatic level changes, Replace blue bar with hedges, Add pause option, Cookie High Score.
       var myGamePiece, myScorePiece, myScore;
       var gameInfo = {
         clearedObj : 0,
