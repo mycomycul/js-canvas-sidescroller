@@ -1,5 +1,5 @@
 //TODO: Implement pause/reset, Replace blue bar with hedges, Cookie High Score, replace level time with clock.
-var myGamePiece, myScorePiece, myScore;
+var myGamePiece, myScorePiece;
 var gameInfo = {
   clearedObj: 0,
   score: 0,
@@ -11,14 +11,16 @@ var infoBoxes;
 var myObstacles = [];
 //Setup keyboard
 var resetKey = 13,
-showFramesKey = 70,
+  showFramesKey = 70,
   moveLeftKey = 37,
   moveRightKey = 39,
   moveUpKey = 38,
   moveDownKey = 40;
 
+/**
+ * Populate side bar next to game space, attach to game data and create a gamepiece
+ */
 function startGame() {
-  //populate side bar next to game space and attach to game data
   infoBoxes = {
     clearedInfo: new infoBox(
       document.getElementById("walls-cleared"),
@@ -40,11 +42,11 @@ function startGame() {
       gameInfo,
       "gameRate"
     ),
-    levelTime: new infoBox(document.getElementById('level-time'),gameInfo,"timeLeftOnLevel")
+    levelTime: new infoBox(document.getElementById('level-time'), gameInfo, "timeLeftOnLevel")
   }
-  myScore = 0;
+
   myGameArea.start();
-  gameInfo.gameRate = 10;
+
   myGamePiece = new component(30, 30, "#00ff00", 10, 120);
 }
 function updateGameArea() {
@@ -56,18 +58,18 @@ function updateGameArea() {
     createNewObstacles();
   }
 
-//If Remove obstacles returns true, update the walls cleared count
-if(moveAndRemoveObstacles()){
+  //If Remove obstacles returns true, update the walls cleared count
+  if (moveAndRemoveObstacles()) {
     gameInfo.clearedObj += 1;
-}
-checkKeyboardActivity();
-updateScore();
-if(gameInfo.timeLeftOnLevel<= 0){
+  }
+  checkKeyboardActivity();
+  updateScore();
+  if (gameInfo.timeLeftOnLevel <= 0) {
     updateLevel();
-}
-updateObjectProperties(infoBoxes);
-myGamePiece.newPos();
-myGamePiece.update();
+  }
+  updateObjectProperties(infoBoxes);
+  myGamePiece.newPos();
+  myGamePiece.update();
 }
 
 /**
@@ -75,15 +77,19 @@ myGamePiece.update();
  * right side and in proportion with gamerate
  *
  */
-function updateScore(){
-    gameInfo.score += Math.floor(
-        (myGamePiece.x * 2) / myGameArea.canvas.width + (1 * gameInfo.gameRate) / 10
-      );
+function updateScore() {
+  gameInfo.score += Math.floor(
+    (myGamePiece.x * 2) / myGameArea.canvas.width + (1 * gameInfo.gameRate) / 10
+  );
 }
-function updateLevel(){
-    gameInfo.timeLeftOnLevel = 10;
-    gameInfo.gameRate += 10;
+/**Reset the time on level and increase the gamerate by 10 */
+function updateLevel() {
+  gameInfo.timeLeftOnLevel = 10;
+  gameInfo.gameRate += 10;
 }
+/**Creates one or two obstacles with the same x-value with a minimum gap in between each 
+ * obstacle for the game piece to pass through
+ */
 function createNewObstacles() {
   var x = myGameArea.canvas.width,
     minHeight = 20,
@@ -100,25 +106,32 @@ function createNewObstacles() {
     new component(10, x - height - gap, "blue", x, height + gap)
   );
 }
-function moveAndRemoveObstacles(){
-    var obstacleRemoved = false;
-    var obstaclesToRemove = [];
-    for (var i = 0; i < myObstacles.length; i++) {
-        myObstacles[i].x -= (1 * gameInfo.gameRate) / 10;
-        // Remove Offscreen Obstacles and update score
-        if (myObstacles[i].x < 0) {
-            obstaclesToRemove.push(i);        
-        }
-        myObstacles[i].update();
-      }
-      if(obstaclesToRemove.length > 0){
-      for (var i = 0; i <obstaclesToRemove.length;i++){
-        myObstacles.splice(0, 1);       
-      }
-      obstacleRemoved = true;
+/**
+ * Move each pixel one pixel to the left and remove any obstacles that are not on in the game area
+ * @returns {boolean} If an obstacle was removed
+ */
+function moveAndRemoveObstacles() {
+  var obstacleRemoved = false;
+  var obstaclesToRemove = [];
+  for (var i = 0; i < myObstacles.length; i++) {
+    myObstacles[i].x -= (1 * gameInfo.gameRate) / 10;
+    // Remove Offscreen Obstacles and update score
+    if (myObstacles[i].x < 0) {
+      obstaclesToRemove.push(i);
     }
-      return obstacleRemoved;
+    myObstacles[i].update();
+  }
+  if (obstaclesToRemove.length > 0) {
+    for (var i = 0; i < obstaclesToRemove.length; i++) {
+      myObstacles.splice(0, 1);
+    }
+    obstacleRemoved = true;
+  }
+  return obstacleRemoved;
 }
+/**
+ * Check for collisions and then stop the game if it occurs
+ */
 function checkForCollisions() {
   for (var i = 0; i < myObstacles.length; i += 1) {
     if (myGamePiece.crashWith(myObstacles[i])) {
@@ -126,6 +139,9 @@ function checkForCollisions() {
     }
   }
 }
+/**
+ * Check for keyboard activity and call the key's action
+ */
 function checkKeyboardActivity() {
   myGamePiece.speedX = 0;
   myGamePiece.speedY = 0;
@@ -158,15 +174,15 @@ function checkKeyboardActivity() {
   }
   //Pause Game
   //Show Frame Count{}
-  if(myGameArea.keys && myGameArea.keys[showFramesKey]){
-      myGameArea.showFrames();
+  if (myGameArea.keys && myGameArea.keys[showFramesKey]) {
+    myGameArea.showFrames();
   }
 }
 
 
 var myGameArea = {
   canvas: document.createElement("canvas"),
-  start: function() {
+  start: function () {
     //Setup Canvas Size and Location
     this.canvas.width = 480;
     this.canvas.height = 270;
@@ -177,44 +193,64 @@ var myGameArea = {
     //Reload the game every 20ms
     this.frameNo = 0;
     this.interval = setInterval(updateGameArea, 20);
-    this.levelInterval = setInterval(function(){gameInfo.timeLeftOnLevel-=1;},1000) 
+    this.levelInterval = setInterval(function () { gameInfo.timeLeftOnLevel -= 1; }, 1000)
     //Setup Check for keyboard activity
-    window.addEventListener("keydown", function(e) {
+    window.addEventListener("keydown", function (e) {
       if (e.keyCode == resetKey) {
         myGameArea.reset();
       }
       myGameArea.keys = myGameArea.keys || [];
       myGameArea.keys[e.keyCode] = true;
     });
-    window.addEventListener("keyup", function(e) {
+    window.addEventListener("keyup", function (e) {
       myGameArea.keys[e.keyCode] = false;
     });
 
   },
-  clear: function() {
+
+  clear: function () {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   },
-  stop: function() {
+  /**
+   * Stop the Intervals
+   */
+  stop: function () {
     clearInterval(this.interval);
     clearInterval(this.levelInterval);
 
   },
-  restart: function() {
+  /**
+   * Start the Intervals
+   */
+  restart: function () {
     this.interval = setInterval(updateGameArea, 20);
-    this.levelInterval = setInterval(function(){gameInfo.timeLeftOnLevel-=1;},1000)
+    this.levelInterval = setInterval(function () { gameInfo.timeLeftOnLevel -= 1; }, 1000);
   },
-  reset: function() {
+
+  /**
+   * Stop clear and reset the game values
+   */
+  reset: function () {
     this.stop();
     this.clear();
     this.canvas.parentNode.removeChild(this.canvas);
+    //Reset Values
+    Object.assign(gameInfo,
+      {
+        clearedObj: 0,
+        score: 0,
+        frames: 0,
+        gameRate: 10,
+        timeLeftOnLevel: 10
+      });
     myObstacles = [];
     startGame();
   },
-  showFrames: function(){
-      
-      infoBoxes.frames.e.parentNode.classList.toggle('hide-me');
+  showFrames: function () {
+
+    infoBoxes.frames.e.parentNode.classList.toggle('hide-me');
   },
-  changeSpeed: function(speedChange) {
+  changeSpeed: function (speedChange) {
     gameInfo.gameRate += speedChange;
   }
 };
@@ -228,7 +264,14 @@ function everyinterval(n) {
   }
   return false;
 }
-
+/**Create a new canvas object including location and possible actions
+ * @param {number} width Width of the object to create
+ * @param {number} width Height of the object to create
+ * @param {string} color #Hex Color, gradient or pattern object for the obstacle
+ * @param {number} x x location of value on the canvas
+ * @param {number} y y location of value on the canvas
+ * @param {string} type If value "text" create filltext else create a rectangle
+ */
 function component(width, height, color, x, y, type) {
   this.type = type;
   this.width = width;
@@ -237,7 +280,7 @@ function component(width, height, color, x, y, type) {
   this.speedY = 0;
   this.x = x;
   this.y = y;
-  this.update = function() {
+  this.update = function () {
     ctx = myGameArea.context;
     ctx.fillStyle = color;
 
@@ -249,27 +292,27 @@ function component(width, height, color, x, y, type) {
     }
   };
 
-  this.newPos = function() {
+  this.newPos = function () {
     this.x += this.speedX;
     this.y += this.speedY;
   };
-  this.moveLeft = function() {
+  this.moveLeft = function () {
     this.speedX -= (1 * gameInfo.gameRate) / 10;
   };
-  this.moveRight = function() {
+  this.moveRight = function () {
     this.speedX += (1 * gameInfo.gameRate) / 10;
   };
-  this.moveUp = function() {
+  this.moveUp = function () {
     this.speedY -= (1 * gameInfo.gameRate) / 10;
   };
-  this.moveDown = function() {
+  this.moveDown = function () {
     this.speedY += (1 * gameInfo.gameRate) / 10;
   };
   function stopMove() {
     this.speedX = 0;
     this.speedy = 0;
   }
-  this.crashWith = function(otherobj) {
+  this.crashWith = function (otherobj) {
     var myleft = this.x;
     var myright = this.x + this.width;
     var mytop = this.y;
@@ -292,7 +335,7 @@ function component(width, height, color, x, y, type) {
 }
 
 /**
- * @description - Creates an object that connects a DOM element to a game stat
+ * @description Creates an object that connects a DOM element to a game stat
  *
  * @param {object} e - element on page to display value in
  * @param {object} infoObject - Object holding info
@@ -303,7 +346,7 @@ function infoBox(e, infoObject, propertyToShow) {
   this.e = e;
   this.object = infoObject;
   this.property = propertyToShow;
-  this.update = function() {
+  this.update = function () {
     var r = this.object[this.property];
     e.innerHTML = r;
   };
@@ -317,11 +360,11 @@ function infoBox(e, infoObject, propertyToShow) {
  */
 function updateObjectProperties(obj, propertyNames) {
   if (!propertyNames) {
-    Object.keys(obj).forEach(function(key) {
+    Object.keys(obj).forEach(function (key) {
       obj[key].update();
     });
   } else {
-    propertyNames.forEach(function(propertyName) {
+    propertyNames.forEach(function (propertyName) {
       obj[propertyName].update();
     });
   }
