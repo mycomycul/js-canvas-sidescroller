@@ -31,15 +31,23 @@ body{
     background-color: black;
    padding:5px;
     border-radius:8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
  
 }
-
+/*Prevent level-time text width from changing the infobox size*/
+#level-time{
+    display: inline-block;
+    width: 20px;
+}
 .info-section{
     margin:10px 5px;
     background-color: #cccccc;
     color:black;
     padding:5px;
     border-radius:3px;
+    
    }
    .hide-me{
        display:none;

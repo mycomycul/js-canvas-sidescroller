@@ -246,10 +246,13 @@ var myGameArea = {
     myObstacles = [];
     startGame();
   },
-  showFrames: function () {
+
+  
+  showFrames: _.debounce(function () {
 
     infoBoxes.frames.e.parentNode.classList.toggle('hide-me');
-  },
+  },150,{'leading':true,'trailing':false}),
+
   changeSpeed: function (speedChange) {
     gameInfo.gameRate += speedChange;
   }
@@ -369,3 +372,5 @@ function updateObjectProperties(obj, propertyNames) {
     });
   }
 }
+
+
